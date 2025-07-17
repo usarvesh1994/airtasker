@@ -1,0 +1,14 @@
+prometheus:
+  prometheusSpec:
+    scrapeInterval: "1s"
+    additionalArgs:
+      - name: web.enable-otlp-receiver
+  service:
+    type: LoadBalancer
+    port: 80
+    targetPort: 9090
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+
+grafana:
+  enabled: false

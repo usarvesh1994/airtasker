@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airtasker-task-canary
+spec: 
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 50%            
+      maxUnavailable: 0       #for latency and HA 
+  selector:
+    matchLabels:
+      app: airtasker-task-canary
+  template:
+    metadata:
+      labels:
+        app: airtasker-task-canary
+    spec:
+      securityContext: # Security not to run as root 
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: airtasker-task
+          image: airtasker-task:latest
+          imagePullPolicy: Never #local dev as we need to use the local docker images
+          ports:
+            - containerPort: 3000
+          env:
+            - name: APP_NAME
+              value: "airtasker-canary"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities: #removeing all admin or anyother capabilities or add capabilities when requried
+              drop:
+                - ALL 
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "256m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 20

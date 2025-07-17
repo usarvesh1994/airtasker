@@ -1,0 +1,73 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: airtasker-apps-all-envs
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - { env: dev, revision: main, cluster: dev-cluster }
+                - { env: prod, revision: main, cluster: dev-cluster }
+          - git:
+              repoURL: https://github.com/usarvesh1994/gitops.git
+              revision: "{{revision}}"
+              directories:
+                - path: overlays/{{env}}/manifests
+  template:
+    metadata:
+      name: "airtasker-{{env}}-app"
+    spec:
+      project: airtasker-project
+      source:
+        repoURL: https://github.com/usarvesh1994/gitops.git
+        targetRevision: "{{revision}}"
+        path: "{{path}}"
+      destination:
+        name: "{{cluster}}"
+        namespace: airtasker-{{env}}
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: airtasker-monitoring
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - { env: dev, revision: main, cluster: dev-cluster }
+                - { env: prod, revision: main, cluster: dev-cluster }
+          - git:
+              repoURL: https://github.com/usarvesh1994/gitops.git
+              revision: "{{revision}}"
+              directories:
+                - path: overlays/{{env}}/monitoring
+  template:
+    metadata:
+      name: "airtasker-monitoring-{{env}}-app"
+    spec:
+      project: airtasker-project
+      source:
+        repoURL: https://github.com/usarvesh1994/gitops.git
+        targetRevision: "{{revision}}"
+        path: "{{path}}"
+      destination:
+        name: "{{cluster}}" 
+        namespace: monitoring
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

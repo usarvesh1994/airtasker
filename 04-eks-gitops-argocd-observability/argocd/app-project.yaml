@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: airtasker-project
+  namespace: argocd
+spec:
+  description: airtasker-project
+  sourceRepos:  
+    - https://github.com/usarvesh1994/gitops.git
+  destinations: 
+    - name: dev-cluster
+      namespace: airtasker-dev
+      server: https://kubernetes.default.svc
+    - name: dev-cluster
+      namespace: argocd
+      server: https://kubernetes.default.svc
+    - name: dev-cluster
+      namespace: monitoring
+      server: https://kubernetes.default.svc
+    - name: dev-cluster
+      namespace: airtasker-prod
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  namespaceResourceWhitelist: 
+    - group: apps
+      kind: Deployment
+    - group: ""
+      kind: Service
+    - group: networking.k8s.io
+      kind: Ingress
+    - group: argoproj.io
+      kind: Application 
+    - group: argoproj.io
+      kind: AppProject
+    - group: argoproj.io
+      kind: ApplicationSet
+    - group: monitoring.coreos.com      
+      kind: ServiceMonitor     
+    - group: autoscaling
+      kind: HorizontalPodAutoscaler           

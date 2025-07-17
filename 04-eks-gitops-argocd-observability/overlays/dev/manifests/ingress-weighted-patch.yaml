@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: airtasker-task
+  annotations:
+    alb.ingress.kubernetes.io/actions.blue-green-forward: |
+      {
+        "type": "forward",
+        "forwardConfig": {
+          "targetGroups": [
+            {
+              "serviceName": "dev-airtasker-task",
+              "servicePort": 80,
+              "weight": 0
+            },
+            {
+              "serviceName": "dev-airtasker-task-canary",
+              "servicePort": 80,
+              "weight": 100
+            }
+          ]
+        }
+      }

@@ -1,0 +1,12 @@
+
+service:
+  type: LoadBalancer
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+resources:
+  requests:
+    cpu:    "256m"
+    memory: "512Mi"
+  limits:
+    cpu:    "1000m"
+    memory: "2Gi"

@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: airtasker-app-of-apps
+  namespace: argocd
+spec:
+  project: airtasker-project
+  source:
+    repoURL: https://github.com/usarvesh1994/gitops.git
+    targetRevision: main
+    path: app  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
